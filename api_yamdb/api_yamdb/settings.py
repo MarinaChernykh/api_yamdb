@@ -147,3 +147,10 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+DEFAULT_FROM_EMAIL = 'def_mail@yambd.com'
+AUTH_USER_MODEL = 'reviews.User'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
