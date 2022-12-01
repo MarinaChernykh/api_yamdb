@@ -1,7 +1,6 @@
 import datetime as dt
 from rest_framework import serializers
-
-from reviews.models import Title, Category, Genre
+from reviews.models import Review, Comment, Title, Category, Genre
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -40,3 +39,27 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
         fields = '__all__'
         lookup_field = 'slug'
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+            read_only=True,
+            slug_field='username'
+            )
+
+    class Meta:
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        read_only_fields = ('title',)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+        )
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'author', 'pub_date')
+        read_only_fields = ('review',)
