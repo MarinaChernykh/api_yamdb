@@ -1,11 +1,9 @@
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth import get_user_model
 from django.db import models
 
 from .validators import UsernameRegexValidator, username_me
+from api_yamdb.settings import AUTH_USER_MODEL
 
-
-User = get_user_model()
 
 LENG_SLUG = 50
 LENG_MAX = 256
@@ -115,7 +113,7 @@ class TitleGenre(models.Model):
 class Review(models.Model):
     text = models.TextField()
     author = models.ForeignKey(
-        User,
+        AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='reviews'
     )
@@ -134,7 +132,7 @@ class Review(models.Model):
 class Comment(models.Model):
     text = models.TextField()
     author = models.ForeignKey(
-        User,
+        AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='comments'
     )
