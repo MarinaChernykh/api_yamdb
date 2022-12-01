@@ -1,7 +1,64 @@
 import datetime as dt
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from reviews.models import Review, Comment, Title, Category, Genre, SCORE_CHOICES
+from rest_framework.validators import UniqueValidator
+
+from reviews.models import Review, Comment, Title, Category, Genre, User, username_me, SCORE_CHOICES
+from reviews.validators import UsernameRegexValidator
+
+class SingUpSerializer(serializers.Serializer):
+    """Сериализатор для регистрации."""
+
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    username = serializers.CharField(
+        required=True,
+        validators=[UsernameRegexValidator(), ]
+    )
+
+    def validate_username(self, value):
+        return username_me(value)
+
+
+class GetTokenSerializer(serializers.Serializer):
+    """Сериализатор для получения токена при регистрации."""
+
+    username = serializers.CharField(
+        required=True,
+        validators=(UsernameRegexValidator(), )
+    )
+    confirmation_code = serializers.CharField(required=True)
+
+    def validate_username(self, value):
+        return username_me(value)
+
+
+class UsersSerializer(serializers.ModelSerializer):
+    """Сериализатор для новых юзеров."""
+
+    username = serializers.CharField(
+        required=True,
+        validators=[
+            UniqueValidator(queryset=User.objects.all()),
+            UsernameRegexValidator()
+        ]
+    )
+
+    class Meta:
+        abstract = True
+        model = User
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role')
+
+
+class PersSerializer(UsersSerializer):
+    """Сериализатор для пользователя."""
+
+    class Meta(UsersSerializer.Meta):
+        read_only_fields = ('role',)
 
 
 class TitleSerializer(serializers.ModelSerializer):
