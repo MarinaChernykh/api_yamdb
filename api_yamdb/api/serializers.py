@@ -75,6 +75,10 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True
     )
+    rating = serializers.IntegerField(
+        source='title_rating',
+        read_only=True
+    )
 
     class Meta:
         model = Title

@@ -2,8 +2,9 @@ from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db import IntegrityError
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, filters, mixins
+from rest_framework import viewsets, filters, mixins, response
 from rest_framework import permissions, status, views
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action, api_view
@@ -128,7 +129,7 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(title_rating=(Avg('reviews__score')))
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
