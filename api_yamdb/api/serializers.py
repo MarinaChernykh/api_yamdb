@@ -1,10 +1,14 @@
 import datetime as dt
+
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import Review, Comment, Title, Category, Genre, User, username_me, SCORE_CHOICES
+from reviews.models import (Review, Comment, Title,
+                            Category, Genre, User,
+                            username_me, SCORE_CHOICES)
 from reviews.validators import UsernameRegexValidator
+
 
 class SingUpSerializer(serializers.Serializer):
     """Сериализатор для регистрации."""
@@ -101,16 +105,16 @@ class GenreSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
-            read_only=True,
-            slug_field='username'
-            )
+        read_only=True,
+        slug_field='username'
+    )
     score = serializers.ChoiceField(choices=SCORE_CHOICES)
 
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         read_only_fields = ('title',)
-    
+
     def validate(self, data):
         request = self.context['request']
         if request.method == 'POST':
@@ -127,7 +131,7 @@ class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username'
-        )
+    )
 
     class Meta:
         model = Comment

@@ -3,7 +3,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, filters, mixins, permissions, status, views
+from rest_framework import viewsets, filters, mixins
+from rest_framework import permissions, status, views
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action, api_view
 from rest_framework_simplejwt.tokens import AccessToken
@@ -14,6 +15,7 @@ from .serializers import (GetTokenSerializer, PersSerializer, SingUpSerializer,
 from reviews.models import User, Title, Category, Genre, Review
 from .permissions import IsAdmin
 
+
 MESSAGE_EMAIL_EXISTS = 'Этот email уже занят'
 MESSAGE_USERNAME_EXISTS = 'Это имя уже занято'
 
@@ -23,7 +25,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     serializer_class = UsersSerializer
     permission_classes = (IsAdmin,)
     lookup_field = 'username'
-    search_fields = ('username', )
+    search_fields = ('username',)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     lookup_field = 'username'
 
@@ -100,6 +102,7 @@ def get_token(request):
         {'confirmation_code': 'Неверный код подтверждения!'},
         status=status.HTTP_400_BAD_REQUEST
     )
+
 
 class CreateListDestroyViewSet(mixins.CreateModelMixin,
                                mixins.ListModelMixin,
