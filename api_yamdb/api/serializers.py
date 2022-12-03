@@ -73,7 +73,8 @@ class TitleSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Genre.objects.all(),
-        many=True
+        many=True,
+        required=False
     )
     rating = serializers.IntegerField(
         source='title_rating',
@@ -82,7 +83,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = ('name', 'year', 'description', 'category', 'genre', 'rating')
 
     def validate_year(self, value):
         year = dt.date.today().year
@@ -96,14 +97,14 @@ class TitleSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ('name', 'slug')
         lookup_field = 'slug'
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = '__all__'
+        fields = ('name', 'slug')
         lookup_field = 'slug'
 
 
