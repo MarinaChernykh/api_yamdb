@@ -12,10 +12,16 @@ LENG_EMAIL = 254
 LENG_CUT = 30
 
 SCORE_CHOICES = (
-    (1, '1'), (2, '2'), (3, '3'),
-    (4, '4'), (5, '5'), (6, '6'),
-    (7, '7'), (8, '8'), (9, '9'),
-    (10, '10')
+    (1, '1 - Отвратительно'),
+    (2, '2 - Очень плохо'),
+    (3, '3 - Плохо'),
+    (4, '4 - Скорее плохо'),
+    (5, '5 - Средне'),
+    (6, '6 - Неплохо'),
+    (7, '7 - Скорее хорошо'),
+    (8, '8 - Хорошо'),
+    (9, '9 - Очень хорошо'),
+    (10, '10 - Великолепно')
 )
 
 
@@ -149,6 +155,13 @@ class Review(models.Model):
 
     def __str__(self):
         return self.text
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'], name='unique_review'
+            )
+        ]
 
 
 class Comment(models.Model):

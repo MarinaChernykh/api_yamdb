@@ -83,7 +83,8 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('name', 'year', 'description', 'category', 'genre', 'rating')
+        fields = ('id', 'name', 'year', 'rating',
+                  'description', 'genre', 'category')
 
     def validate_year(self, value):
         year = dt.date.today().year
@@ -95,6 +96,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор для работы с категориями."""
     class Meta:
         model = Category
         fields = ('name', 'slug')
@@ -102,6 +104,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
+    """Сериализатор для работы с жанрами."""
     class Meta:
         model = Genre
         fields = ('name', 'slug')
@@ -109,6 +112,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """Сериализатор для работы с отзывами."""
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username'
@@ -133,6 +137,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор для работы с комментариями."""
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username'

@@ -24,7 +24,7 @@ class Command(BaseCommand):
                     id=row[0],
                     username=row[1],
                     email=row[2],
-                    role=row[1],
+                    role=row[3],
                 )
         with open(r'static\data\category.csv', encoding='utf-8') as file:
             reader = csv.reader(file)

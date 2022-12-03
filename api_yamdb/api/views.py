@@ -23,6 +23,7 @@ MESSAGE_USERNAME_EXISTS = 'Это имя уже занято'
 
 
 class UsersViewSet(viewsets.ModelViewSet):
+    """Отображение действий с пользователями."""
     queryset = User.objects.all()
     serializer_class = UsersSerializer
     permission_classes = (IsAdmin,)
@@ -116,6 +117,7 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin,
 class CategoryViewSet(CreateListDestroyViewSet):
     """Вьюсет для категорий."""
     queryset = Category.objects.all()
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
@@ -125,6 +127,7 @@ class CategoryViewSet(CreateListDestroyViewSet):
 class GenreViewSet(CreateListDestroyViewSet):
     """Отображение действий с жанрами для произведений."""
     queryset = Genre.objects.all()
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
@@ -132,7 +135,7 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    """ОВьюсет для произведений."""
+    """Вьюсет для произведений."""
     queryset = Title.objects.annotate(title_rating=(Avg('reviews__score')))
     permission_classes = (IsAdminOrReadOnly,)
     serializer_class = TitleSerializer
