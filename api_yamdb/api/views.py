@@ -14,7 +14,8 @@ from .serializers import (GetTokenSerializer, PersSerializer, SingUpSerializer,
                           UsersSerializer, TitleSerializer, CategorySerializer,
                           GenreSerializer, ReviewSerializer, CommentSerializer)
 from reviews.models import User, Title, Category, Genre, Review
-from .permissions import IsAdmin
+from .permissions import (IsAdmin, IsAdminOrReadOnly,
+                          IsAuthorOrModeratorOrAdminOrReadOnly)
 
 
 MESSAGE_EMAIL_EXISTS = 'Этот email уже занят'
@@ -113,6 +114,7 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin,
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
+    """Вьюсет для категорий."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
@@ -121,6 +123,7 @@ class CategoryViewSet(CreateListDestroyViewSet):
 
 
 class GenreViewSet(CreateListDestroyViewSet):
+    """Отображение действий с жанрами для произведений."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
@@ -129,14 +132,20 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """ОВьюсет для произведений."""
     queryset = Title.objects.annotate(title_rating=(Avg('reviews__score')))
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """Отображение действий с отзывами."""
     serializer_class = ReviewSerializer
+    permission_classes = (
+        IsAuthorOrModeratorOrAdminOrReadOnly,
+    )
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs['title_id'])
@@ -148,7 +157,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Отображение действий с комментариями."""
     serializer_class = CommentSerializer
+    permission_classes = (
+        IsAuthorOrModeratorOrAdminOrReadOnly,
+    )
 
     def get_queryset(self):
         review = get_object_or_404(
