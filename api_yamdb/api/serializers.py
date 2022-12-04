@@ -65,17 +65,25 @@ class PersSerializer(UsersSerializer):
         read_only_fields = ('role',)
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор для работы с категориями."""
+    class Meta:
+        model = Category
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    """Сериализатор для работы с жанрами."""
+    class Meta:
+        model = Genre
+        fields = ('name', 'slug')
+        lookup_field = 'slug'
+
+
 class TitleSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(
-        slug_field='slug',
-        queryset=Category.objects.all()
-    )
-    genre = serializers.SlugRelatedField(
-        slug_field='slug',
-        queryset=Genre.objects.all(),
-        many=True,
-        required=False
-    )
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(many=True, read_only=True)
     rating = serializers.IntegerField(
         source='title_rating',
         read_only=True
@@ -93,22 +101,6 @@ class TitleSerializer(serializers.ModelSerializer):
                 'Год выпуска не может быть больше текущего!'
             )
         return value
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    """Сериализатор для работы с категориями."""
-    class Meta:
-        model = Category
-        fields = ('name', 'slug')
-        lookup_field = 'slug'
-
-
-class GenreSerializer(serializers.ModelSerializer):
-    """Сериализатор для работы с жанрами."""
-    class Meta:
-        model = Genre
-        fields = ('name', 'slug')
-        lookup_field = 'slug'
 
 
 class ReviewSerializer(serializers.ModelSerializer):
