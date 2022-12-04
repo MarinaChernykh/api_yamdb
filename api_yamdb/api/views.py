@@ -135,6 +135,7 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """Вьюсет для произведений."""
     queryset = Title.objects.annotate(title_rating=(Avg('reviews__score')))
     permission_classes = (IsAdminOrReadOnly,)
     serializer_class = TitleSerializer
