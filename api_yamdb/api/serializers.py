@@ -1,4 +1,3 @@
-import datetime as dt
 from datetime import datetime
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -79,28 +78,6 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
         fields = ('name', 'slug')
         lookup_field = 'slug'
-
-
-class TitleSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
-    genre = GenreSerializer(many=True, read_only=True)
-    rating = serializers.IntegerField(
-        source='title_rating',
-        read_only=True
-    )
-
-    class Meta:
-        model = Title
-        fields = ('id', 'name', 'year', 'rating',
-                  'description', 'genre', 'category')
-
-    def validate_year(self, value):
-        year = dt.date.today().year
-        if value > year:
-            raise serializers.ValidationError(
-                'Год выпуска не может быть больше текущего!'
-            )
-        return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):
