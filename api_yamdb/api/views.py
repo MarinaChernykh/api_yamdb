@@ -6,20 +6,18 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters, mixins, response
 from rest_framework import permissions, status, views
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action, api_view
 from rest_framework_simplejwt.tokens import AccessToken
+from django_filters.rest_framework import DjangoFilterBackend
+
 from .filters import FilterForTitle
-
-
 from .serializers import (GetTokenSerializer, PersSerializer, SingUpSerializer,
                           UsersSerializer, CategorySerializer,
                           GenreSerializer, ReviewSerializer, CommentSerializer,
                           TitleReadSerializer, TitleWriteSerializer)
 from reviews.models import User, Title, Category, Genre, Review
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
-                          IsAuthorOrModeratorOrAdminOrReadOnly,
-                          )
+                          IsAuthorOrModeratorOrAdminOrReadOnly)
 
 
 MESSAGE_EMAIL_EXISTS = 'Этот email уже занят'
@@ -119,7 +117,7 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin,
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
-    """Вьюсет для категорий."""
+    """Отображение действий с категориями произведений."""
     queryset = Category.objects.all()
     permission_classes = (IsAdminOrReadOnly,)
     serializer_class = CategorySerializer
@@ -128,19 +126,8 @@ class CategoryViewSet(CreateListDestroyViewSet):
     lookup_field = 'slug'
 
 
-# class GenreViewSet(CreateListDestroyViewSet):
-#     """Отображение действий с жанрами для произведений."""
-#     queryset = Genre.objects.all()
-#     permission_classes = (IsAdminOrReadOnly,)
-#     serializer_class = GenreSerializer
-#     filter_backends = (filters.SearchFilter,)
-#     search_fields = ('name',)
-#     lookup_field = 'slug'
-
-
 class GenreViewSet(CreateListDestroyViewSet):
     """Отображение действий с жанрами для произведений."""
-
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
@@ -151,7 +138,7 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    """Вьюсет для произведений."""
+    """Отображение действий с произведениями."""
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     )
@@ -160,7 +147,6 @@ class TitleViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter, )
     filterset_class = FilterForTitle
     filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
-    # ordering_fields = ('name',)
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):

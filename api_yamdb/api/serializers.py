@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -119,7 +120,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
-    """Сериализатор для возврата списка произведений."""
+    """Сериализатор для получения информации о произведениях."""
 
     rating = serializers.IntegerField(read_only=True)
     category = CategorySerializer(read_only=True)
@@ -132,7 +133,7 @@ class TitleReadSerializer(serializers.ModelSerializer):
 
 
 class TitleWriteSerializer(serializers.ModelSerializer):
-    """Сериализатор для добавления произведений."""
+    """Сериализатор для добавления и изменения инфо о произведениях."""
 
     genre = serializers.SlugRelatedField(
         slug_field='slug',
@@ -144,15 +145,11 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(),
     )
     rating = serializers.IntegerField(required=False)
-    # year = serializers.IntegerField(required=False)
 
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'rating',
                   'description', 'genre', 'category')
-
-    # def to_representation(self, instance):
-    #     return TitleReadSerializer(instance).data
 
     def validate_year(self, data):
         if data >= dt.now().year:
@@ -160,11 +157,3 @@ class TitleWriteSerializer(serializers.ModelSerializer):
                 f'Год {data} больше текущего!',
             )
         return data
-    
-    # def validate_year(self, value):                       # Почему не работает???????
-    #     year = dt.date.today().year
-    #     if value > year:
-    #         raise serializers.ValidationError(
-    #             'Год выпуска не может быть больше текущего!'
-    #         )
-    #     return value
