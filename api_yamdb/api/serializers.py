@@ -1,5 +1,5 @@
 import datetime as dt
-
+from datetime import datetime
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -139,3 +139,54 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
         read_only_fields = ('review',)
+
+
+class TitleReadSerializer(serializers.ModelSerializer):
+    """Сериализатор для возврата списка произведений."""
+
+    rating = serializers.IntegerField(read_only=True)
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Title
+        fields = (
+            'id', 'name', 'year',
+            'rating', 'description',
+            'genre', 'category')
+        read_only_fields = (
+            'id', 'name', 'year',
+            'rating', 'description',
+            'genre', 'category')
+
+
+class TitleWriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для добавления произведений."""
+
+    genre = serializers.SlugRelatedField(
+        slug_field='slug',
+        many=True,
+        queryset=Genre.objects.all(),
+    )
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Category.objects.all(),
+    )
+    rating = serializers.IntegerField(required=False)
+    year = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = Title
+        fields = ('id', 'name', 'year',
+                  'description', 'genre',
+                  'rating', 'category')
+
+    def to_representation(self, instance):
+        return TitleReadSerializer(instance).data
+
+    def validate_year(self, data):
+        if data >= datetime.now().year:
+            raise serializers.ValidationError(
+                f'Год {data} больше текущего!',
+            )
+        return data

@@ -103,39 +103,42 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(
+        'Жанр',
+        max_length=150,
+        unique=True
+    )
+    slug = models.SlugField(
+        'Слаг',
+        max_length=50,
+        unique=True
+    )
 
     def __str__(self):
-        return self.name
+        return self.slug
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=256)
-    year = models.IntegerField()
-    description = models.TextField(null=True, blank=True)
+    name = models.CharField('Название произведения', max_length=200)
+    year = models.IntegerField('Дата выпуска')
+    description = models.TextField('Описание')
+    genre = models.ManyToManyField(
+        Genre,
+        blank=True,
+        db_index=True,
+        related_name='titles',
+        verbose_name='Жанр'
+    )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
-        null=True,
         blank=True,
-        related_name='titles'
-    )
-    genre = models.ManyToManyField(
-        Genre, through='TitleGenre',
-        related_name='titles'
+        null=True,
+        verbose_name='Категория'
     )
 
     def __str__(self):
-        return self.title
-
-
-class TitleGenre(models.Model):
-    title = models.ForeignKey(Title, on_delete=models.CASCADE)
-    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f'{self.title} {self.genre}'
+        return self.name
 
 
 class Review(models.Model):
