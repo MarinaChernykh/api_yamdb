@@ -1,5 +1,4 @@
-import datetime as dt
-
+from datetime import datetime as dt
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -81,28 +80,6 @@ class GenreSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
 
-# class TitleSerializer(serializers.ModelSerializer):
-#     category = CategorySerializer(read_only=True)
-#     genre = GenreSerializer(many=True, read_only=True)
-#     rating = serializers.IntegerField(
-#         source='title_rating',
-#         read_only=True
-#     )
-
-#     class Meta:
-#         model = Title
-#         fields = ('id', 'name', 'year', 'rating',
-#                   'description', 'genre', 'category')
-
-#     def validate_year(self, value):
-#         year = dt.date.today().year
-#         if value > year:
-#             raise serializers.ValidationError(
-#                 'Год выпуска не может быть больше текущего!'
-#             )
-#         return value
-
-
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор для работы с отзывами."""
     author = serializers.SlugRelatedField(
@@ -150,14 +127,8 @@ class TitleReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = (
-            'id', 'name', 'year',
-            'rating', 'description',
-            'genre', 'category')
-        read_only_fields = (
-            'id', 'name', 'year',
-            'rating', 'description',
-            'genre', 'category')
+        fields = ('id', 'name', 'year', 'rating',
+                  'description', 'genre', 'category')
 
 
 class TitleWriteSerializer(serializers.ModelSerializer):
@@ -173,16 +144,15 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(),
     )
     rating = serializers.IntegerField(required=False)
-    year = serializers.IntegerField(required=False)
+    # year = serializers.IntegerField(required=False)
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year',
-                  'description', 'genre',
-                  'rating', 'category')
+        fields = ('id', 'name', 'year', 'rating',
+                  'description', 'genre', 'category')
 
-    def to_representation(self, instance):
-        return TitleReadSerializer(instance).data
+    # def to_representation(self, instance):
+    #     return TitleReadSerializer(instance).data
 
     def validate_year(self, data):
         if data >= dt.now().year:
@@ -190,3 +160,11 @@ class TitleWriteSerializer(serializers.ModelSerializer):
                 f'Год {data} больше текущего!',
             )
         return data
+    
+    # def validate_year(self, value):                       # Почему не работает???????
+    #     year = dt.date.today().year
+    #     if value > year:
+    #         raise serializers.ValidationError(
+    #             'Год выпуска не может быть больше текущего!'
+    #         )
+    #     return value
