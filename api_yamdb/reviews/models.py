@@ -103,42 +103,67 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-    name = models.CharField(
-        'Жанр',
-        max_length=150,
-        unique=True
-    )
-    slug = models.SlugField(
-        'Слаг',
-        max_length=50,
-        unique=True
-    )
+    name = models.CharField(max_length=256)
+    slug = models.SlugField(max_length=50, unique=True)
 
     def __str__(self):
-        return self.slug
+        return self.name
+    
+    # name = models.CharField(
+    #     'Жанр',
+    #     max_length=150,
+    #     unique=True
+    # )
+    # slug = models.SlugField(
+    #     'Слаг',
+    #     max_length=50,
+    #     unique=True
+    # )
+
+    # def __str__(self):
+    #     return self.slug
 
 
 class Title(models.Model):
-    name = models.CharField('Название произведения', max_length=200)
-    year = models.IntegerField('Дата выпуска')
-    description = models.TextField('Описание')
+    name = models.CharField(max_length=256)
+    year = models.IntegerField()
+    description = models.TextField(blank=True)
     genre = models.ManyToManyField(
-        Genre,
+        Genre, null=True,
         blank=True,
-        db_index=True,
-        related_name='titles',
-        verbose_name='Жанр'
+        related_name='titles'
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
-        blank=True,
         null=True,
-        verbose_name='Категория'
+        blank=True,
+        related_name='titles'
     )
 
     def __str__(self):
         return self.name
+
+    # name = models.CharField('Название произведения', max_length=200)
+    # year = models.IntegerField('Дата выпуска')
+    # description = models.TextField('Описание')
+    # genre = models.ManyToManyField(
+    #     Genre,
+    #     blank=True,
+    #     db_index=True,
+    #     related_name='titles',
+    #     verbose_name='Жанр'
+    # )
+    # category = models.ForeignKey(
+    #     Category,
+    #     on_delete=models.SET_NULL,
+    #     blank=True,
+    #     null=True,
+    #     verbose_name='Категория'
+    # )
+
+    # def __str__(self):
+    #     return self.name
 
 
 class Review(models.Model):

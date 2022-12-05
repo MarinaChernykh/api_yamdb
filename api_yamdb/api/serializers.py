@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime as dt
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -127,14 +127,8 @@ class TitleReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = (
-            'id', 'name', 'year',
-            'rating', 'description',
-            'genre', 'category')
-        read_only_fields = (
-            'id', 'name', 'year',
-            'rating', 'description',
-            'genre', 'category')
+        fields = ('id', 'name', 'year', 'rating',
+                  'description', 'genre', 'category')
 
 
 class TitleWriteSerializer(serializers.ModelSerializer):
@@ -150,20 +144,27 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(),
     )
     rating = serializers.IntegerField(required=False)
-    year = serializers.IntegerField(required=False)
+    # year = serializers.IntegerField(required=False)
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year',
-                  'description', 'genre',
-                  'rating', 'category')
+        fields = ('id', 'name', 'year', 'rating',
+                  'description', 'genre', 'category')
 
-    def to_representation(self, instance):
-        return TitleReadSerializer(instance).data
+    # def to_representation(self, instance):
+    #     return TitleReadSerializer(instance).data
 
     def validate_year(self, data):
-        if data >= datetime.now().year:
+        if data >= dt.now().year:
             raise serializers.ValidationError(
                 f'Год {data} больше текущего!',
             )
         return data
+    
+    # def validate_year(self, value):                       # Почему не работает???????
+    #     year = dt.date.today().year
+    #     if value > year:
+    #         raise serializers.ValidationError(
+    #             'Год выпуска не может быть больше текущего!'
+    #         )
+    #     return value
