@@ -11,11 +11,12 @@ from rest_framework.decorators import action, api_view
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .serializers import (GetTokenSerializer, PersSerializer, SingUpSerializer,
-                          UsersSerializer, TitleSerializer, CategorySerializer,
-                          GenreSerializer, ReviewSerializer, CommentSerializer)
+                          UsersSerializer, CategorySerializer,
+                          GenreSerializer, ReviewSerializer, CommentSerializer, TitleReadSerializer, TitleWriteSerializer)
 from reviews.models import User, Title, Category, Genre, Review
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
                           IsAuthorOrModeratorOrAdminOrReadOnly)
+from .filters import FilterForTitle
 
 
 MESSAGE_EMAIL_EXISTS = 'Этот email уже занят'
@@ -124,44 +125,71 @@ class CategoryViewSet(CreateListDestroyViewSet):
     lookup_field = 'slug'
 
 
+# class GenreViewSet(CreateListDestroyViewSet):
+#     """Отображение действий с жанрами для произведений."""
+#     queryset = Genre.objects.all()
+#     permission_classes = (IsAdminOrReadOnly,)
+#     serializer_class = GenreSerializer
+#     filter_backends = (filters.SearchFilter,)
+#     search_fields = ('name',)
+#     lookup_field = 'slug'
+
+
 class GenreViewSet(CreateListDestroyViewSet):
     """Отображение действий с жанрами для произведений."""
     queryset = Genre.objects.all()
-    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = GenreSerializer
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
     lookup_field = 'slug'
+    search_fields = ('name',)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для произведений."""
-    queryset = Title.objects.annotate(title_rating=(Avg('reviews__score')))
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')
+    )
     permission_classes = (IsAdminOrReadOnly,)
-    serializer_class = TitleSerializer
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter, )
+    filterset_class = FilterForTitle
+    ordering_fields = ('name',)
 
-    def get_queryset(self):
-        queryset = Title.objects.all()
-        category_slug = self.request.query_params.get('category')
-        if category_slug is not None:
-            queryset = queryset.filter(category__slug=category_slug)
-        return queryset.annotate(title_rating=(Avg('reviews__score')))
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return TitleReadSerializer
+        return TitleWriteSerializer
+    
+    
+    
+# class TitleViewSet(viewsets.ModelViewSet):
+#     """Вьюсет для произведений."""
+#     queryset = Title.objects.annotate(title_rating=(Avg('reviews__score')))
+#     permission_classes = (IsAdminOrReadOnly,)
+#     serializer_class = TitleSerializer
+#     filter_backends = (DjangoFilterBackend,)
+#     filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
 
-    def perform_create(self, serializer):
-        category_slug = self.request.data.get('category',None)
-        category = get_object_or_404(Category, slug=category_slug)
-        genre_list = []
-        genre_slugs = self.request.data.get('genre',None)
-        if isinstance(genre_slugs, list):
-            for slug in genre_slugs:
-                genre_list.append(get_object_or_404(Genre, slug=slug))
-        else:
-            genre_list.append(get_object_or_404(Genre, slug=genre_slugs))
-        serializer.save(category=category, genre=genre_list)
+#     def get_queryset(self):
+#         queryset = Title.objects.all()
+#         category_slug = self.request.query_params.get('category')
+#         if category_slug is not None:
+#             queryset = queryset.filter(category__slug=category_slug)
+#         return queryset.annotate(title_rating=(Avg('reviews__score')))
 
-    perform_update = perform_create
+#     def perform_create(self, serializer):
+#         category_slug = self.request.data.get('category',None)
+#         category = get_object_or_404(Category, slug=category_slug)
+#         genre_list = []
+#         genre_slugs = self.request.data.get('genre',None)
+#         if isinstance(genre_slugs, list):
+#             for slug in genre_slugs:
+#                 genre_list.append(get_object_or_404(Genre, slug=slug))
+#         else:
+#             genre_list.append(get_object_or_404(Genre, slug=genre_slugs))
+#         serializer.save(category=category, genre=genre_list)
+
+#     perform_update = perform_create
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

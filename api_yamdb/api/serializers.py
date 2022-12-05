@@ -81,26 +81,26 @@ class GenreSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
-    genre = GenreSerializer(many=True, read_only=True)
-    rating = serializers.IntegerField(
-        source='title_rating',
-        read_only=True
-    )
+# class TitleSerializer(serializers.ModelSerializer):
+#     category = CategorySerializer(read_only=True)
+#     genre = GenreSerializer(many=True, read_only=True)
+#     rating = serializers.IntegerField(
+#         source='title_rating',
+#         read_only=True
+#     )
 
-    class Meta:
-        model = Title
-        fields = ('id', 'name', 'year', 'rating',
-                  'description', 'genre', 'category')
+#     class Meta:
+#         model = Title
+#         fields = ('id', 'name', 'year', 'rating',
+#                   'description', 'genre', 'category')
 
-    def validate_year(self, value):
-        year = dt.date.today().year
-        if value > year:
-            raise serializers.ValidationError(
-                'Год выпуска не может быть больше текущего!'
-            )
-        return value
+#     def validate_year(self, value):
+#         year = dt.date.today().year
+#         if value > year:
+#             raise serializers.ValidationError(
+#                 'Год выпуска не может быть больше текущего!'
+#             )
+#         return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -139,3 +139,54 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
         read_only_fields = ('review',)
+
+
+class TitleReadSerializer(serializers.ModelSerializer):
+    """Сериализатор для возврата списка произведений."""
+
+    rating = serializers.IntegerField(read_only=True)
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Title
+        fields = (
+            'id', 'name', 'year',
+            'rating', 'description',
+            'genre', 'category')
+        read_only_fields = (
+            'id', 'name', 'year',
+            'rating', 'description',
+            'genre', 'category')
+
+
+class TitleWriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для добавления произведений."""
+
+    genre = serializers.SlugRelatedField(
+        slug_field='slug',
+        many=True,
+        queryset=Genre.objects.all(),
+    )
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Category.objects.all(),
+    )
+    rating = serializers.IntegerField(required=False)
+    year = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = Title
+        fields = ('id', 'name', 'year',
+                  'description', 'genre',
+                  'rating', 'category')
+
+    def to_representation(self, instance):
+        return TitleReadSerializer(instance).data
+
+    def validate_year(self, data):
+        if data >= dt.now().year:
+            raise serializers.ValidationError(
+                f'Год {data} больше текущего!',
+            )
+        return data
