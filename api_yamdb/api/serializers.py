@@ -15,11 +15,11 @@ class SingUpSerializer(serializers.Serializer):
 
     email = serializers.EmailField(
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        validators=(UniqueValidator(queryset=User.objects.all()))
     )
     username = serializers.CharField(
         required=True,
-        validators=[UsernameRegexValidator(), ]
+        validators=(UsernameRegexValidator(), )
     )
 
     def validate_username(self, value):
