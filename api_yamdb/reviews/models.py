@@ -39,7 +39,7 @@ class User(AbstractUser):
         blank=False,
         help_text='Только буквы, цифры и @/./+/-/_',
         error_messages={
-            'unique': "Пользователь с таким именем уже существует!",
+            'unique': 'Пользователь с таким именем уже существует!',
         },
     )
     email = models.EmailField(
@@ -58,8 +58,6 @@ class User(AbstractUser):
         'Биография',
         blank=True,
     )
-
-    REQUIRED_FIELDS = ('email', )
 
     class Meta:
         ordering = ('id',)
@@ -91,7 +89,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
-        ordering = ("name",)
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -104,7 +102,7 @@ class Genre(models.Model):
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
-        ordering = ("name",)
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -132,7 +130,7 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
-        ordering = ("-year",)
+        ordering = ('-year',)
 
     def __str__(self):
         return self.name
@@ -164,7 +162,7 @@ class Review(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        ordering = ("-pub_date",)
+        ordering = ('-pub_date',)
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'title'], name='unique_review'
@@ -192,7 +190,7 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-        ordering = ("-pub_date",)
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text
