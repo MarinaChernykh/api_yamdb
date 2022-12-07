@@ -56,7 +56,14 @@ pip install -r requirements.txt
 cd api_yamdb/
 python manage.py migrate
 ```
-5. Запустить проект:
+
+5. Для заполнения базы данных из scv файлов разместите их в директории static и выполните команду:
+```
+python manage.py import_from_csv
+```
+В настоящий момент папка static содержит пример необходимых файлов, а база данных заполнена ими
+
+6. Запустить проект:
 ```
 python manage.py runserver
 ```

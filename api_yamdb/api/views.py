@@ -109,14 +109,10 @@ def get_token(request):
     )
 
 
-class CreateListDestroyViewSet(mixins.CreateModelMixin,
-                               mixins.ListModelMixin,
-                               mixins.DestroyModelMixin,
-                               viewsets.GenericViewSet):
-    pass
-
-
-class CategoryViewSet(CreateListDestroyViewSet):
+class CategoryViewSet(mixins.CreateModelMixin,
+                      mixins.ListModelMixin,
+                      mixins.DestroyModelMixin,
+                      viewsets.GenericViewSet):
     """Отображение действий с категориями произведений."""
     queryset = Category.objects.all()
     permission_classes = (IsAdminOrReadOnly,)
@@ -126,7 +122,10 @@ class CategoryViewSet(CreateListDestroyViewSet):
     lookup_field = 'slug'
 
 
-class GenreViewSet(CreateListDestroyViewSet):
+class GenreViewSet(mixins.CreateModelMixin,
+                   mixins.ListModelMixin,
+                   mixins.DestroyModelMixin,
+                   viewsets.GenericViewSet):
     """Отображение действий с жанрами для произведений."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer

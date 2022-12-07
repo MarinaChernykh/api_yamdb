@@ -15,11 +15,11 @@ class SingUpSerializer(serializers.Serializer):
 
     email = serializers.EmailField(
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        validators=(UniqueValidator(queryset=User.objects.all()),)
     )
     username = serializers.CharField(
         required=True,
-        validators=[UsernameRegexValidator(), ]
+        validators=(UsernameRegexValidator(),)
     )
 
     def validate_username(self, value):
@@ -31,7 +31,7 @@ class GetTokenSerializer(serializers.Serializer):
 
     username = serializers.CharField(
         required=True,
-        validators=(UsernameRegexValidator(), )
+        validators=(UsernameRegexValidator(),)
     )
     confirmation_code = serializers.CharField(required=True)
 
@@ -44,10 +44,10 @@ class UsersSerializer(serializers.ModelSerializer):
 
     username = serializers.CharField(
         required=True,
-        validators=[
+        validators=(
             UniqueValidator(queryset=User.objects.all()),
             UsernameRegexValidator()
-        ]
+        )
     )
 
     class Meta:
@@ -99,8 +99,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         if request.method == 'POST':
             title = get_object_or_404(
                 Title, id=self.context['view'].kwargs['title_id'])
-            author = request.user
-            if title.reviews.filter(author=author).exists():
+            if title.reviews.filter(author=request.user).exists():
                 raise serializers.ValidationError(
                     'Вы не можете оставить отзыв повторно!')
         return data
